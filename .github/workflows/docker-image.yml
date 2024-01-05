@@ -20,12 +20,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-    
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }} --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-    
+
+    - name: Set up Docker Buildx
+      run: docker buildx create --use
+
     - name: Log in to the Container registry
       run: docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ${{ env.REGISTRY }}
     
-    - name: Push the Docker image
-      run: docker push -a ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    - name: Build & Push image
+      run: docker buildx build --file Dockerfile --platfom linux/arm64,linux/amd64 --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.run_number }} --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest --push
+

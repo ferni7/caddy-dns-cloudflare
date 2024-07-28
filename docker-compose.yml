@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  caddy:
+    container_name: caddy
+    image: ghcr.io/ferni7/caddy-dns-cloudflare:latest
+    ports:
+      - 443:443
+    volumes:
+      - ${PWD}/Caddyfile:/etc/caddy/Caddyfile
+      - ${PWD}/www:/www
+      - ${PWD}/log:/var/log
+    environment:
+      - TZ=Australia/Melbourne
+      - CLOUDFLARE_AUTH_TOKEN=xxxx
+    depends_on:
+      - php-fpm
+  php-fpm:
+    container_name: php-fpm
+    image: php:8.3-fpm-alpine
+    restart: unless-stopped
+    volumes:
+      - ${PWD}/www:/www
